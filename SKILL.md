@@ -16,6 +16,7 @@ When the user triggers nonstop mode, complete a **pre-flight sequence** before d
 Mentally simulate the entire execution path of the task from start to finish. This is not a generic checklist — it is a task-specific dry run.
 
 **How to think:**
+
 1. Break the task into concrete steps (what will you actually do, in order?)
 2. For EACH step, imagine yourself executing it right now. Ask: "What could go wrong here? What would make me stop and ask the user?"
 3. Think about the environment: what machines, services, credentials, permissions does this touch?
@@ -23,6 +24,7 @@ Mentally simulate the entire execution path of the task from start to finish. Th
 5. Think about the edges: what if the test fails? what if the build takes 30 minutes? what if a file doesn't exist?
 
 **Surface to the user:**
+
 - Anything that would make you stop and ask — surface it NOW
 - Ambiguous requirements where you'd need to make a judgment call — clarify NOW
 - Credentials, tokens, permissions you might need — confirm NOW
@@ -86,12 +88,14 @@ Say: "Nonstop mode ON. Go rest — I've got this."
 When you encounter something that would normally make you stop and ask the user, follow this decision tree:
 
 ### Level 1: Can I solve it myself?
+
 - Missing info → search the codebase, read docs, check git history
 - Test failing → read the error, fix it
 - Build error → diagnose and fix
 - **If yes → solve it and move on. Don't stop.**
 
 ### Level 2: Can I work around it?
+
 - Permission denied → check if there's an alternative path (different API, different approach)
 - External service down → skip that part, continue with other tasks
 - Ambiguous requirement → pick the most reasonable interpretation, document your choice
@@ -100,11 +104,13 @@ When you encounter something that would normally make you stop and ask the user,
   - If the result would be materially different → do NOT proceed, mark the task as blocked
 
 ### Level 3: Truly blocked
+
 - Update the task status to blocked, noting: what you tried, why it failed, what the user needs to do
 - Move on to the next task. Do NOT spin on unsolvable problems.
 - **NEVER**: brute-force retry the same failing action, disable safety checks to bypass a blocker, make destructive changes to work around permissions, or guess at credentials/tokens.
 
 ### Subagent Delegation
+
 - For long-running operations (builds, tests, deploys), spawn a background Agent to monitor
 - Don't block the main thread waiting for results
 - Continue with other work while subagents run
@@ -112,9 +118,11 @@ When you encounter something that would normally make you stop and ask the user,
 ## Deactivation — `/nonstop off`
 
 1. Remove the flag:
+
    ```bash
    rm -f ~/.claude/hooks/state/nonstop-$SESSION_ID.active ~/.claude/hooks/state/nonstop-$SESSION_ID.count
    ```
+
 2. Present a summary from the task list:
    - Tasks completed
    - Tasks where you took workarounds (and why)

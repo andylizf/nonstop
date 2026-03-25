@@ -113,6 +113,7 @@ Long-running ops (builds, tests) get delegated to background agents. Claude does
 ### When you're back
 
 `/nonstop off`, or just check the task list:
+
 - **Completed**: done
 - **Workaround**: done, but verify the approach
 - **Blocked**: needs you
