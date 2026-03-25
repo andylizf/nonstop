@@ -128,8 +128,8 @@ Session-scoped. Flag file per session ID. Auto-deactivates after `NONSTOP_MAX` n
 
 | | Approach | What's different |
 |---|---|---|
-| [taskmaster](https://github.com/blader/taskmaster) | Must emit `TASKMASTER_DONE::` token to stop | No pre-flight. No decision framework. Token-based. |
-| [Ralph loop](https://github.com/frankbria/ralph-claude-code) | External bash loop restarting Claude | Loses context on restart. Nonstop stays in-session. |
+| [taskmaster](https://github.com/blader/taskmaster) | Must emit `TASKMASTER_DONE::` token to stop | No risk assessment, no blocker handling. Just a completion token. |
+| [Ralph loop](https://github.com/frankbria/ralph-claude-code) | External orchestrator wrapping the CLI | Full-featured (~2k lines bash), prompt-based status protocol, circuit breakers. Nonstop is two files you drop in. |
 | Raw stop hook | `{"decision": "block"}` | Blocks blindly. No intelligence. |
 | **nonstop** | Pre-flight + smart blocking + decision framework | Thinks ahead. Handles blockers. Knows when to actually stop. |
 
