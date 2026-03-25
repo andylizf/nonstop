@@ -2,9 +2,7 @@
   <h1 align="center">nonstop</h1>
   <p align="center">
     <em>"Why do you write like you're running out of time?"</em>
-    <br/>
-    <strong>Autonomous work mode for Claude Code.</strong>
-    <br/>
+    <br/><br/>
     Go to sleep. Wake up to finished work.
   </p>
 </p>
@@ -12,26 +10,22 @@
 <p align="center">
   <a href="#install">Install</a> &middot;
   <a href="#how-it-works">How it works</a> &middot;
-  <a href="#usage">Usage</a> &middot;
-  <a href="#configuration">Configuration</a>
+  <a href="#compared-to">Compared to</a>
 </p>
 
 ---
 
-**nonstop** is a Claude Code skill + stop hook that lets Claude work autonomously while you're away. It's not just "don't stop" — it's an intelligent autonomous work protocol:
-
-1. **Before you leave** — Claude does a full mental dry-run of the task, surfaces every possible blocker, and gets your sign-off on dangerous operations
-2. **While you're away** — A stop hook prevents Claude from halting. When blocked, Claude follows a decision framework: solve it, work around it, or skip it and move on
-3. **When you're back** — Check the task list to see what's done, what was worked around, and what needs you
+Your overnight Claude session, except it actually finishes. Type `/nonstop` before you walk away. Claude asks every question now, gets your sign-off on anything dangerous, then works through the night — solving blockers, routing around problems, and knowing when to stop trying.
 
 ## The Problem
 
-You give Claude a complex task, walk away, and come back to find it stopped 2 minutes in asking "should I use tabs or spaces?" Or it hit a permission error and just... gave up.
+You hand Claude a 4-hour task and go to bed. You wake up and it stopped 3 minutes in:
 
-**nonstop** fixes this by:
-- Forcing Claude to think ahead and ask all questions **before** you leave
-- Giving Claude a clear decision framework for handling blockers autonomously
-- Preventing premature stops with a session-scoped stop hook
+> *"Should I use the existing auth middleware or write a new one?"*
+
+Or it hit a permission error on step 2 of 47 and just... sat there. Waiting. For 8 hours.
+
+**nonstop** makes Claude do what a good engineer does when the boss leaves: figure it out, work around it, or write it down and move on to the next thing.
 
 ## Install
 
@@ -39,9 +33,9 @@ You give Claude a complex task, walk away, and come back to find it stopped 2 mi
 
 Paste this into Claude Code:
 
-> Fetch and follow the instructions at https://raw.githubusercontent.com/andylizf/nonstop/main/INSTALL.md
-
-Claude will download the skill, hook, and configure everything automatically.
+```
+Fetch and follow the instructions at https://raw.githubusercontent.com/andylizf/nonstop/main/INSTALL.md
+```
 
 ### Plugin marketplace
 
@@ -58,113 +52,86 @@ curl -fsSL https://raw.githubusercontent.com/andylizf/nonstop/main/install.sh | 
 
 ## How It Works
 
-### Pre-flight: Before You Walk Away
+### Before you leave: the pre-flight
 
-When you type `/nonstop`, Claude doesn't just start working. It runs a **4-phase pre-flight sequence**:
+`/nonstop` triggers a 4-phase sequence. Claude won't start working until all of this is done.
 
-#### Phase 1: Mental Simulation
-
-Claude mentally executes every step of your task and surfaces anything that might cause a stop:
+**1. Mental simulation** — Claude walks through every step of your task in its head and flags anything that would make it stop:
 
 ```
-Here's what I plan to do:
-1. Refactor the auth module to use JWT
-2. Update all 12 test files
-3. Run the full test suite
+Here's my plan:
+1. Refactor auth module to JWT
+2. Update 12 test files
+3. Run full test suite
 4. Push to feature branch
 
-Here's what might block me:
-- The test suite needs a running Redis instance — is one available?
-- I'll need to update the CI config — OK to modify .github/workflows?
-- There's an ambiguous requirement: should the old session tokens be migrated or dropped?
+Potential blockers:
+- Test suite needs Redis — is one running?
+- I'll modify .github/workflows — OK?
+- Ambiguous: should old session tokens be migrated or dropped?
 
-Can you confirm these before you go?
+Confirm before you go?
 ```
 
-#### Phase 2: Dangerous Operations Manifest
+**2. Dangerous ops manifest** — Anything that touches the outside world gets explicit approval:
 
-Claude presents every category of risky action and gets explicit approval:
+| | Examples |
+|---|---|
+| **Kill processes** | GPU jobs, services |
+| **Delete** | rm -rf, git clean, drop tables |
+| **Force push** | git push --force |
+| **Social** | Post PRs, comments, Slack |
+| **Paid APIs** | External calls, webhooks |
+| **Resources** | Claim GPU, large disk |
 
-| Category | Examples | Your call |
-|---|---|---|
-| **Kill processes** | GPU jobs, services | Approve/deny with scope |
-| **Delete files** | rm, git clean, drop tables | Approve/deny with scope |
-| **Force push** | git push --force | Approve/deny |
-| **Social / comms** | Post PRs, comments, Slack | Approve/deny with scope |
-| **External APIs** | Paid APIs, webhooks | Approve/deny |
-| ... | ... | ... |
+You can approve all, deny all, or scope it ("delete in /tmp, not /data"). Your call.
 
-The principle: **anything that leaves a trace in the outside world or costs money** needs your sign-off. You can approve all, deny all, or set scoped permissions ("OK to delete in /tmp, not /data").
+**3. Permissions check** — Claude checks your permission mode. If you're not on bypass or auto, it'll warn you that permission prompts will block it while you're gone.
 
-#### Phase 3: Confirm and Go
+**4. Confirm and go** — Scope, workaround policy, ground rules. Then:
 
-Claude confirms the scope, workaround policy, and activates. You walk away.
+*"Nonstop mode ON. Go rest — I've got this."*
 
-### During: The Decision Framework
+### While you're away: the decision framework
 
-When Claude hits a blocker, it follows a strict decision tree:
+A stop hook blocks Claude from halting. When something goes wrong:
 
 ```
-Level 1: Can I solve it myself?
-  Yes → solve it, keep going
-
-Level 2: Can I work around it without changing the outcome?
-  Yes → work around it, note what I did
-  No  → the workaround would change the result
-
-Level 3: Truly blocked
-  → Mark task as blocked (what I tried, why it failed, what you need to do)
-  → Move to next task
-  → NEVER: brute-force retry, disable safety checks, guess credentials
+Can I solve it?           → Solve it. Keep going.
+Can I work around it?     → Only if the outcome stays the same. Note what I did.
+Truly stuck?              → Mark it blocked. Move to next task. Don't spin.
 ```
 
-### After: Check the Task List
+What Claude will **never** do: brute-force retry, disable safety checks, guess credentials, or take unapproved destructive actions.
 
-When you're back, run `/nonstop off` or just check the task list:
+Long-running ops (builds, tests) get delegated to background agents. Claude doesn't sit and wait.
+
+### When you're back
+
+`/nonstop off` — or just check the task list:
 - **Completed** — done
-- **Workarounds taken** — done, but check the approach
-- **Blocked** — needs your input
-
-## Usage
-
-```
-/nonstop          # activate (starts pre-flight)
-/nonstop on       # same as above
-/nonstop off      # deactivate + show summary
-```
-
-Nonstop mode is **session-scoped** — it only affects the current session and doesn't persist across restarts.
-
-## Configuration
-
-| Variable | Default | Description |
-|---|---|---|
-| `NONSTOP_MAX` | `5` | Max nudges before auto-deactivating. Set to `0` for unlimited. |
-
-```bash
-export NONSTOP_MAX=10  # allow more nudges before giving up
-export NONSTOP_MAX=0   # never auto-deactivate (use with caution)
-```
+- **Workaround** — done, but verify the approach
+- **Blocked** — needs you
 
 ## How It's Built
 
-Two files. That's it.
+Two files.
 
-| File | What it does |
+| File | Role |
 |---|---|
-| `SKILL.md` | The skill definition — tells Claude the pre-flight protocol and decision framework |
-| `nonstop.sh` | The stop hook — blocks Claude from stopping, with loop protection and nudge counting |
+| `SKILL.md` | Pre-flight protocol, dangerous ops manifest, blocker decision framework |
+| `nonstop.sh` | Stop hook — blocks premature stops, tracks nudge count, prevents infinite loops via `stop_hook_active` |
 
-The stop hook reads the Claude Code hook JSON from stdin, checks for a session-scoped flag file, and returns `{"decision": "block"}` with the decision framework as the reason. The `stop_hook_active` flag from Claude Code prevents infinite loops.
+Session-scoped. Flag file per session ID. Auto-deactivates after `NONSTOP_MAX` nudges (default 5, `export NONSTOP_MAX=0` for unlimited).
 
 ## Compared To
 
-| Tool | Approach | Difference |
+| | Approach | What's different |
 |---|---|---|
-| [taskmaster](https://github.com/blader/taskmaster) | Requires `TASKMASTER_DONE::` token to stop | Token-based; no pre-flight, no decision framework |
-| [Ralph loop](https://github.com/frankbria/ralph-claude-code) | External bash loop re-running Claude | Restarts Claude; nonstop works within one session |
-| Raw stop hook | `{"decision": "block"}` | No intelligence — just blocks blindly |
-| **nonstop** | Pre-flight + smart blocking + decision framework | Thinks ahead, handles blockers, knows when to actually stop |
+| [taskmaster](https://github.com/blader/taskmaster) | Must emit `TASKMASTER_DONE::` token to stop | No pre-flight. No decision framework. Token-based. |
+| [Ralph loop](https://github.com/frankbria/ralph-claude-code) | External bash loop restarting Claude | Loses context on restart. Nonstop stays in-session. |
+| Raw stop hook | `{"decision": "block"}` | Blocks blindly. No intelligence. |
+| **nonstop** | Pre-flight + smart blocking + decision framework | Thinks ahead. Handles blockers. Knows when to actually stop. |
 
 ## License
 
