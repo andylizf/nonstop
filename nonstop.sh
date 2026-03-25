@@ -14,6 +14,7 @@ NONSTOP_MAX="${NONSTOP_MAX:-5}"  # max nudges per session; 0 = unlimited
 input=$(cat)
 
 # --- Extract session_id and stop_hook_active ---
+# shellcheck disable=SC2154  # variables assigned via eval
 eval "$(echo "$input" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
@@ -22,10 +23,12 @@ print(f'stop_hook_active={str(d.get(\"stop_hook_active\", False)).lower()}')
 " 2>/dev/null)"
 
 # --- Check if nonstop mode is active for THIS session ---
+# shellcheck disable=SC2154
 active_file="$STATE_DIR/nonstop-${session_id}.active"
 [ -f "$active_file" ] || exit 0
 
 # --- If already nudged once this turn, allow stop (prevent infinite loop) ---
+# shellcheck disable=SC2154
 [ "$stop_hook_active" = "true" ] && exit 0
 
 # --- Counter: track nudges, bail after NONSTOP_MAX ---

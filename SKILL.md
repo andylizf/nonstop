@@ -65,12 +65,15 @@ Ask the user: **"What's your current permission mode? (check the bottom status b
 
 ### Phase 4: Confirm and Activate
 
-Ask the user to confirm:
+Present the summary and ask the user to confirm. **Do NOT activate until the user explicitly replies.**
+
 1. **Scope**: "Here's what I'll do: [list]. Anything to add or remove?"
 2. **Workaround policy**: "If I hit a blocker, should I: (a) skip and continue, (b) attempt a workaround, or (c) stop and wait?"
 3. **Fallback for unapproved ops**: "Dangerous ops you didn't pre-approve will be marked as blocked and skipped. OK?"
 
-Once confirmed, activate:
+**STOP HERE. Wait for the user to reply.** Do not proceed until you receive an explicit confirmation (e.g. "go", "yes", "confirmed", "looks good"). The user triggering /nonstop is NOT confirmation — it starts the pre-flight, not the work.
+
+Once the user confirms, activate:
 
 ```bash
 mkdir -p ~/.claude/hooks/state && touch ~/.claude/hooks/state/nonstop-$SESSION_ID.active

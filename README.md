@@ -1,4 +1,8 @@
 <p align="center">
+  <a href="https://github.com/andylizf/nonstop/actions/workflows/ci.yml"><img src="https://github.com/andylizf/nonstop/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+</p>
+
+<p align="center">
   <h1 align="center">nonstop</h1>
   <p align="center">
     <em>"Why do you write like you're running out of time?"</em>
