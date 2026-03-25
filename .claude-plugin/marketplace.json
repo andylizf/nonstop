@@ -1,0 +1,35 @@
+{
+  "name": "nonstop",
+  "owner": {
+    "name": "Zhifei Li",
+    "email": "andylizf@github"
+  },
+  "metadata": {
+    "description": "Autonomous work mode for Claude Code",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "nonstop",
+      "description": "Autonomous work mode — pre-flight risk assessment, dangerous-ops approval, blocker decision framework, and session-scoped stop hook. Lets Claude work continuously while you're away.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./"
+      ],
+      "hooks": {
+        "Stop": [
+          {
+            "matcher": "",
+            "hooks": [
+              {
+                "type": "command",
+                "command": "bash $PLUGIN_DIR/nonstop.sh"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

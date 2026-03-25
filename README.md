@@ -35,36 +35,32 @@ You give Claude a complex task, walk away, and come back to find it stopped 2 mi
 
 ## Install
 
-```bash
-# One-line install
-curl -fsSL https://raw.githubusercontent.com/andylizf/nonstop/main/install.sh | bash
+### Tell Claude (easiest)
+
+Paste this into Claude Code:
+
+> Fetch and follow the instructions at https://raw.githubusercontent.com/andylizf/nonstop/main/INSTALL.md
+
+Claude will download the skill, hook, and configure everything automatically.
+
+### Plugin marketplace
+
+```
+/plugin marketplace add andylizf/nonstop
+/plugin install nonstop@nonstop
 ```
 
-Or manually:
+### Manual
 
 ```bash
-# 1. Copy the skill
-mkdir -p ~/.claude/skills/nonstop
-cp SKILL.md ~/.claude/skills/nonstop/
-
-# 2. Copy the stop hook
-mkdir -p ~/.claude/hooks ~/.claude/hooks/state
-cp nonstop.sh ~/.claude/hooks/
-chmod +x ~/.claude/hooks/nonstop.sh
-
-# 3. Register the hook in ~/.claude/settings.json
-# Add this to the "Stop" array in "hooks":
-# {
-#   "matcher": "",
-#   "hooks": [{"type": "command", "command": "bash ~/.claude/hooks/nonstop.sh"}]
-# }
+curl -fsSL https://raw.githubusercontent.com/andylizf/nonstop/main/install.sh | bash
 ```
 
 ## How It Works
 
 ### Pre-flight: Before You Walk Away
 
-When you type `/nonstop`, Claude doesn't just start working. It runs a **3-phase pre-flight sequence**:
+When you type `/nonstop`, Claude doesn't just start working. It runs a **4-phase pre-flight sequence**:
 
 #### Phase 1: Mental Simulation
 
