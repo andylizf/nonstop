@@ -37,7 +37,7 @@ You give Claude a complex task, walk away, and come back to find it stopped 2 mi
 
 ```bash
 # One-line install
-curl -fsSL https://raw.githubusercontent.com/andylixn/nonstop/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/andylizf/nonstop/main/install.sh | bash
 ```
 
 Or manually:

@@ -8,7 +8,7 @@ HOOKS_DIR="$HOME/.claude/hooks"
 STATE_DIR="$HOOKS_DIR/state"
 SETTINGS="$HOME/.claude/settings.json"
 
-REPO_URL="https://raw.githubusercontent.com/andylixn/nonstop/main"
+REPO_URL="https://raw.githubusercontent.com/andylizf/nonstop/main"
 
 echo "Installing nonstop..."
 
