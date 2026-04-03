@@ -9,7 +9,9 @@ A session-scoped autonomous work mode. When activated, Claude works continuously
 
 ## Activation — `/nonstop` or `/nonstop on`
 
-When the user triggers nonstop mode, complete a **pre-flight sequence** before doing any work. The pre-flight exists because once the user walks away, there is no one to answer questions — every ambiguity must be resolved now.
+When the user triggers nonstop mode, **start the pre-flight sequence immediately**. Drop whatever else you are doing — do not wait for background agents, pending reads, or other in-progress work. The pre-flight is the priority now.
+
+Complete the pre-flight **before doing any work**. The pre-flight exists because once the user walks away, there is no one to answer questions — every ambiguity must be resolved now.
 
 ### Phase 1: Mental Simulation — Anticipate Every Blocker
 
