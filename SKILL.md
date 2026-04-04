@@ -80,8 +80,10 @@ Present the summary and ask the user to confirm. **Do NOT activate until the use
 Once the user confirms, activate:
 
 ```bash
-mkdir -p ~/.claude/hooks/state && touch ~/.claude/hooks/state/nonstop-$SESSION_ID.active
+mkdir -p ~/.claude/hooks/state && touch ~/.claude/hooks/state/nonstop.activate
 ```
+
+This signals the stop hook to create a session-scoped flag on your next turn end. The hook knows your session ID and will handle the rest.
 
 Say: "Nonstop mode ON. Go rest — I've got this."
 
@@ -119,10 +121,10 @@ When you encounter something that would normally make you stop and ask the user,
 
 ## Deactivation — `/nonstop off`
 
-1. Remove the flag:
+1. Signal deactivation:
 
    ```bash
-   rm -f ~/.claude/hooks/state/nonstop-$SESSION_ID.active ~/.claude/hooks/state/nonstop-$SESSION_ID.count
+   touch ~/.claude/hooks/state/nonstop.deactivate
    ```
 
 2. Present a summary from the task list:
@@ -137,7 +139,7 @@ Nonstop mode auto-deactivates after NONSTOP_MAX nudges (default 5, env var `NONS
 
 ## Technical Details
 
-- Session-scoped: flag file is `~/.claude/hooks/state/nonstop-<session_id>.active`
-- Stop hook: `~/.claude/hooks/nonstop.sh` checks flag and blocks premature stops
+- **Activation handshake**: Claude touches `nonstop.activate` → stop hook creates session-scoped `nonstop-<session_id>.active` (hook knows the session ID from its JSON input, Claude doesn't need to)
+- **Deactivation handshake**: Claude touches `nonstop.deactivate` → stop hook removes the session-scoped flag
 - `stop_hook_active` flag prevents infinite loops (allows stop on 2nd attempt per turn)
 - Nudge counter tracks blocks per session; auto-cleans on deactivation
